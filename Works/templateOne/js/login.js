@@ -18,9 +18,11 @@ display: none;
 email.before(test)
 let idArray = []
 if (localStorage.getItem("userIdes")) {
-  idArray = localStorage.getItem("userIdes")
-  if (!Array.isArray(idArray)) {
-    idArray = []
+  try {
+    idArray = JSON.parse(localStorage.getItem("userIdes")) || [];
+    if (!Array.isArray(idArray)) idArray = [];
+  } catch (e) {
+    idArray = [];
   }
 }
 submit.addEventListener('click', function () {
@@ -32,11 +34,19 @@ submit.addEventListener('click', function () {
         let check = idArray.some(el => Object.values(el.id).join() == JSON.parse(localStorage.getItem("accounts"))[i].id) 
         if(!check) {
           let userId = JSON.parse(localStorage.getItem("accounts"))[i].id
-          idArray.push({id: {user: userId}})
-          localStorage.setItem("userIdes", JSON.stringify(idArray))
+          let check = idArray.some(el => el.id === userId);
+          if (!check) {
+            idArray.push({
+              id: userId,
+              text: [],
+              images: []
+              });
+            localStorage.setItem("userIdes", JSON.stringify(idArray));
+          }          
           setTimeout(() => {
             console.log("Hello")
           }, 5000);
+          localStorage.setItem("currentUserId", userId)
           open("index.html", "_self")
         }
         break
